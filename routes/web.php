@@ -13,14 +13,28 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
+Route::get('/test', function () {
+    return 'welcome';
+});
+
 Route::get('/', function () {
     return view('welcome');
 })->middleware(['verify.shopify'])->name('home');
 
-Route::get('/groups', [\App\Http\Controllers\FaqController::class, 'groupIndex'])
+Route::match(['GET', 'POST'], '/auth', [\App\Http\Controllers\AuthController::class, 'authenticate'])->name('auth');
+
+Route::get('/groups-index', [\App\Http\Controllers\FaqController::class, 'groupIndex'])
     ->middleware(['verify.shopify'])
     ->name('group.index');
 
-Route::post('/groups', [\App\Http\Controllers\FaqController::class, 'groupStore'])
+Route::post('/groups-index', [\App\Http\Controllers\FaqController::class, 'groupIndex'])
     ->middleware(['verify.shopify'])
-    ->name('group.store');
+    ->name('group.save');
+
+Route::get('/faqs/{groupid}', [\App\Http\Controllers\FaqController::class, 'faqs'])
+    ->middleware(['verify.shopify'])
+    ->name('group.faqs');
+
+Route::post('/faqs/{groupid}', [\App\Http\Controllers\FaqController::class, 'faqs'])
+    ->middleware(['verify.shopify'])
+    ->name('group.faqs.save');

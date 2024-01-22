@@ -1,88 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>Side bar</title>
-    <style>
-        .mainSection .sideBar h1 {
-            font-size: 18px;
-            font-weight: 500;
-            color:#000;
-        }
+@extends('layouts.master')
 
-    </style>
-</head>
-<body>
+@section('title', 'Create Group')
 
-<div class="row mainSection">
-    <div class="col-md-4">
-        <h1>Side bar </h1>
-    </div>
-    <div class="col-md-4 body">
-        <div class="createGroup">
-             <form action="{{ route('group.store') }}" method="post">
+@section('contents')
+    <div class="p-[100px] bg-base-200">
+        <div class="">
 
-                <div class="form-group">
-                    <label for="name">Namesdfsd</label>
-                    <input type="text" class="form-control" id="name" name="name" aria-describedby="emailHelp">
+            <!-- Form Area -->
+            <div class="min-h-screen hidden" id="create-group">
+                <div class="flex justify-between">
+                    <h3 class="text-indigo-600 font-semibold">Groups</h3>
+                    <button onclick="hideCreateGroup()"class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Cancel</button>
                 </div>
-                  <div class="form-group">
-                    <label for="exampleFormControlTextarea1">Description</label>
-                    <textarea name="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                 <div class="ml-[50px] ">
+                    <p class="text-gray-800 text-3xl font-semibold">Create new groups</p>
+                    <p>FAQ Groups are the base of the FAQ system. You can create as many groups as you want and add
+                        faq to them.</p>
                 </div>
-                <div class="form-group form-check">
-                    <input name="status" type="checkbox" class="form-check-input" id="status">
-                    <label class="form-check-label" for="status">status</label>
+                <!-- form  -->
+                <div class="flex flex-row ml-[50px]">
+                    <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100 mt-[50px]">
+                        <form class="card-body" method="post" action="{{ route('group.save') }}">
+                            @sessionToken
+                            <input type="hidden" id="groupid" name="groupid">
+                            <div class="form-control">
+                                <label class="label"><span class="label-text">Group Name</span></label>
+                                <input type="text" id="name" placeholder="Name" name="name" class="input input-bordered" required />
+                            </div>
+                            <div class="form-control">
+                                <label class="label"><span class="label-text">Description</span></label>
+                               <textarea id="description" class="textarea textarea-bordered" name="description" placeholder="Description"></textarea>
+                            </div>
+                            <div class="form-control mt-6">
+                                <button class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                @sessionToken
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            </div>
+            <!-- Table  -->
+            <div class="">
+                <div class="flex justify-between">
+                    <div class="max-w-lg space-y-3">
+                        <h3 class="text-indigo-600 font-semibold">Groups</h3>
+                        <p class="text-gray-800 text-3xl font-semibold sm:text-4xl">
+                            Available groups
+                        </p>
+                        <p>
+                            Here are your available groups. You can edit or delete them.
+                        </p>
+                    </div>
+                    <div>
+                        <button onclick="showCreateGroup()"
+                            class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            Create Group
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto bg-white min-h-screen">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>Group Id</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($groups as $group)
+                            <tr>
+                                <th>{{$group->id}}</th>
+                                <td>{{$group->name}}</td>
+                                <td>{{$group->description}}</td>
+                                <td class="text-right whitespace-nowrap">
+                                    <button onclick="editGroup(this)"class="py-1.5 px-3 text-gray-600 hover:text-gray-500 duration-150 hover:bg-gray-50 border rounded-lg"
+                                    data-id="{{ $group->id }}" data-name="{{ $group->name }}"
+                                    data-description="{{ $group->description }}">Edit</button>
+                                            &nbsp;
+                                    <a href="{{ URL::tokenRoute('group.faqs', ['groupid' => $group->id]) }}"
+                                                class="py-1.5 px-3 text-red-600 hover:text-gray-500 duration-150 hover:bg-red-50 border rounded-lg">FAQs</a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class=" col-md-4 groupList">
-        <table class="table">
-        <thead class="thead-dark">
-            <tr>
-            <th scope="col">#</th>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            </tr>
-            <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            </tr>
-            <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            </tr>
-        </tbody>
-        </table>
+@endsection
 
+@push('scripts')
+    <script>
+        function showCreateGroup() {
+            document.getElementById('create-group').classList.remove('hidden');
+        }
 
-    </div>
+        function hideCreateGroup() {
+            document.getElementById('create-group').classList.add('hidden');
+            //clear the values
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('groupid').value = '';
+        }
 
-</div>
+        function editGroup(button) {
+            console.log(button.dataset);
+            document.getElementById('create-group').classList.remove('hidden');
+            //get the data-name, data-description and data-id
+            document.getElementById('name').value = button.dataset.name;
+            document.getElementById('description').value = button.dataset.description;
+            document.getElementById('groupid').value = button.dataset.id;
+        }
 
-
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-</body>
-</html>
+    </script>
+@endpush
